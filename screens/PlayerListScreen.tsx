@@ -1,26 +1,23 @@
 import React, { useState } from 'react'
 import { StyleSheet, View, Text, ScrollView, TextInput } from 'react-native'
+import { Picker } from '@react-native-community/picker'
 import useFetch from '../hooks/useFetch'
 
-// const POSITIONS = {
-//   10: 'Gardien',
-//   20: 'Defenseur',
-//   21: 'Lateral',
-//   30: 'Milieu défensir',
-//   31: 'Milieu offensif',
-//   40: 'Attaquant',
-// }
-
-// const positions = playersData?.poolPlayers.reduce(
-//   (acc, elem) => (acc.includes(elem.ultraPosition) ? acc : acc.concat(elem.ultraPosition)),
-//   []
-// )
+const POSITIONS = {
+  10: 'Gardien',
+  20: 'Defenseur',
+  21: 'Lateral',
+  30: 'Milieu défensir',
+  31: 'Milieu offensif',
+  40: 'Attaquant',
+}
 
 const formatPlayerName = (player) =>
   player.firstName ? `${player.firstName} ${player.lastName}` : player.lastName
 
 export default function PlayerListScreen() {
   const [input, setInput] = useState('')
+  const [selectedValue, setSelectedValue] = useState('')
 
   const { data: clubsData, error: clubsError } = useFetch(
     'https://api.mpg.football/api/data/championship-clubs'
@@ -30,6 +27,10 @@ export default function PlayerListScreen() {
   )
   const clubs = clubsData?.championshipClubs
   const players = playersData?.poolPlayers
+    .filter((player) => {
+      if (selectedValue === '') return true
+      return player.ultraPosition == selectedValue
+    })
     .filter((player) => formatPlayerName(player).toLowerCase().includes(input.toLowerCase().trim()))
     .sort((a, b) => a.ultraPosition - b.ultraPosition)
 
@@ -49,7 +50,10 @@ export default function PlayerListScreen() {
       {}
     )
 
-  console.log(playersByClubs)
+  const positions = playersData?.poolPlayers.reduce(
+    (acc, elem) => (acc.includes(elem.ultraPosition) ? acc : acc.concat(elem.ultraPosition)),
+    []
+  )
 
   if (clubsError || playersError) {
     return <Text>Une erreur est survenue</Text>
@@ -58,6 +62,17 @@ export default function PlayerListScreen() {
   return (
     <View style={styles.container}>
       <TextInput style={styles.input} onChangeText={setInput} value={input} />
+      <Picker
+        selectedValue={selectedValue}
+        style={{ height: 50, width: 150 }}
+        onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}
+      >
+        <Picker.Item label={'Sélectionner'} value={''} />
+        {positions?.map(
+          (position) =>
+            POSITIONS[position] && <Picker.Item label={POSITIONS[position]} value={position} />
+        )}
+      </Picker>
       <ScrollView>
         {!playersByClubs ? (
           <Text>Chargement ...</Text>
