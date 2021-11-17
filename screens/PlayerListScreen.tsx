@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
-import { StyleSheet, View, Text, ScrollView, TextInput } from 'react-native'
+import { StyleSheet, View, Text, ScrollView, TextInput, Pressable } from 'react-native'
 import { Picker } from '@react-native-community/picker'
 import useFetch from '../hooks/useFetch'
+import { FontAwesome5 } from '@expo/vector-icons'
 
 const POSITIONS = {
   10: 'Gardien',
@@ -55,13 +56,20 @@ export default function PlayerListScreen() {
     []
   )
 
+  const clearInput = () => setInput('')
+
   if (clubsError || playersError) {
     return <Text>Une erreur est survenue</Text>
   }
 
   return (
     <View style={styles.container}>
-      <TextInput style={styles.input} onChangeText={setInput} value={input} />
+      <View style={{ justifyContent: 'center' }}>
+        <TextInput style={styles.input} onChangeText={setInput} value={input} />
+        <Pressable style={{ position: 'absolute', right: 25 }} onPress={clearInput}>
+          <FontAwesome5 name='times' />
+        </Pressable>
+      </View>
       <Picker
         selectedValue={selectedValue}
         style={{ height: 50, width: 150 }}
