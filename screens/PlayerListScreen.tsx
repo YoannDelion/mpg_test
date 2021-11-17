@@ -1,5 +1,5 @@
-import React from 'react'
-import { StyleSheet, View, Text, ScrollView } from 'react-native'
+import React, { useState } from 'react'
+import { StyleSheet, View, Text, ScrollView, TextInput } from 'react-native'
 import useFetch from '../hooks/useFetch'
 
 // const POSITIONS = {
@@ -16,7 +16,12 @@ import useFetch from '../hooks/useFetch'
 //   []
 // )
 
+const formatPlayerName = (player) =>
+  player.firstName ? `${player.firstName} ${player.lastName}` : player.lastName
+
 export default function PlayerListScreen() {
+  const [input, setInput] = useState('')
+
   const { data: clubsData, error: clubsError } = useFetch(
     'https://api.mpg.football/api/data/championship-clubs'
   )
@@ -24,7 +29,9 @@ export default function PlayerListScreen() {
     'https://api.mpg.football/api/data/championship-players-pool/1'
   )
   const clubs = clubsData?.championshipClubs
-  const players = playersData?.poolPlayers.sort((a, b) => a.ultraPosition - b.ultraPosition)
+  const players = playersData?.poolPlayers
+    .filter((player) => formatPlayerName(player).toLowerCase().includes(input.toLowerCase().trim()))
+    .sort((a, b) => a.ultraPosition - b.ultraPosition)
 
   const playersByClubs =
     clubs &&
@@ -42,32 +49,38 @@ export default function PlayerListScreen() {
       {}
     )
 
+  console.log(playersByClubs)
+
   if (clubsError || playersError) {
     return <Text>Une erreur est survenue</Text>
   }
 
   return (
-    <ScrollView>
-      {!playersByClubs ? (
-        <Text>Chargement ...</Text>
-      ) : (
-        Object.values(playersByClubs).map((playerByClub, index) => (
-          <View key={index} style={{ border: '1px solid black', margin: 2, padding: 2 }}>
-            <Text>{playerByClub.club.shortName}</Text>
-            {playerByClub.players.map((player) => (
-              <Text key={player.id}>{player.lastName}</Text>
-            ))}
-          </View>
-        ))
-      )}
-    </ScrollView>
+    <View style={styles.container}>
+      <TextInput style={styles.input} onChangeText={setInput} value={input} />
+      <ScrollView>
+        {!playersByClubs ? (
+          <Text>Chargement ...</Text>
+        ) : Object.values(playersByClubs).length === 0 ? (
+          <Text>Aucun résultat</Text>
+        ) : (
+          Object.values(playersByClubs).map((playerByClub, index) => (
+            <View key={index} style={{ border: '1px solid black', margin: 2, padding: 2 }}>
+              <Text style={styles.title}>{playerByClub.club.shortName}</Text>
+              {playerByClub.players.map((player) => (
+                <Text key={player.id}>{formatPlayerName(player)}</Text>
+              ))}
+            </View>
+          ))
+        )}
+      </ScrollView>
+    </View>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
     justifyContent: 'center',
   },
   title: {
@@ -78,5 +91,11 @@ const styles = StyleSheet.create({
     marginVertical: 30,
     height: 1,
     width: '80%',
+  },
+  input: {
+    height: 40,
+    margin: 12,
+    borderWidth: 1,
+    padding: 10,
   },
 })
