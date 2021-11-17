@@ -1,13 +1,11 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { StyleSheet, Text, ScrollView } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import { ScrollView } from 'react-native'
 import { Picker } from '@react-native-community/picker'
 import useFetch from '../hooks/useFetch'
 import PlayerType from '../types/PlayerType'
 import formatPlayerName from '../utils/formatPlayerName'
 import { POSITIONS } from '../utils/consants'
 import { PlayersByClubsType } from '../types/PlayerByClubsType'
-import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { RootStackParamList } from '../navigation/Navigation'
 import styled from 'styled-components/native'
 import Loader from '../components/Loader'
 import Subtitle from '../components/Subtitle'
@@ -39,6 +37,7 @@ export default function PlayerListScreen() {
   )
   const clubs = clubsData?.championshipClubs
 
+  // Filtre les players
   let players: PlayerType[] = playersData?.poolPlayers
   players = players
     ?.filter((player) => {
@@ -47,6 +46,7 @@ export default function PlayerListScreen() {
     })
     .filter((player) => formatPlayerName(player).toLowerCase().includes(input.toLowerCase().trim()))
 
+  // Renvoie les données sous forme { club_id : club: {}, players: [] } pour les affichers par club
   const playersByClubs: PlayersByClubsType =
     clubs &&
     players?.reduce(
