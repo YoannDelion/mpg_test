@@ -14,7 +14,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'PlayerList'>
 
 export default function PlayerListScreen({ navigation }: Props) {
   const [input, setInput] = useState('')
-  const [selectedValue, setSelectedValue] = useState('')
+  const [selectedValue, setSelectedValue] = useState<number | string>('')
 
   const { data: clubsData, error: clubsError } = useFetch(
     'https://api.mpg.football/api/data/championship-clubs'
@@ -28,7 +28,7 @@ export default function PlayerListScreen({ navigation }: Props) {
   players = players
     ?.filter((player) => {
       if (selectedValue === '') return true
-      return player.ultraPosition === parseInt(selectedValue)
+      return player.ultraPosition == selectedValue
     })
     .filter((player) => formatPlayerName(player).toLowerCase().includes(input.toLowerCase().trim()))
     .sort((a, b) => a.ultraPosition - b.ultraPosition)
@@ -71,8 +71,8 @@ export default function PlayerListScreen({ navigation }: Props) {
       </View>
       <Picker
         selectedValue={selectedValue}
-        style={{ height: 50, width: 150 }}
-        onValueChange={(itemValue) => setSelectedValue(itemValue.toString())}
+        style={{ height: 50 }}
+        onValueChange={(itemValue) => setSelectedValue(itemValue)}
       >
         <Picker.Item label={'Sélectionner'} value={''} />
         {positions?.map(
@@ -93,6 +93,7 @@ export default function PlayerListScreen({ navigation }: Props) {
               <Text style={styles.title}>{playerByClub.club.shortName}</Text>
               {playerByClub.players.map((player) => (
                 <Pressable
+                  key={player.id}
                   onPress={() =>
                     navigation.navigate('PlayerDetails', {
                       player,
@@ -100,7 +101,7 @@ export default function PlayerListScreen({ navigation }: Props) {
                     })
                   }
                 >
-                  <Text key={player.id}>{formatPlayerName(player)}</Text>
+                  <Text>{formatPlayerName(player)}</Text>
                 </Pressable>
               ))}
             </View>
@@ -131,5 +132,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 10,
   },
-  card: { border: '1px solid black', margin: 2, padding: 2 },
+  card: {
+    borderWidth: 1,
+    borderStyle: 'solid',
+    margin: 2,
+    padding: 2,
+  },
 })
