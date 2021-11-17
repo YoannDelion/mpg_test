@@ -14,10 +14,10 @@ interface StatsLabelType {
   [key: string]: string
 }
 export const statsLabel: StatsLabelType = {
-  averageRating: 'averageRating',
-  totalGoals: 'totalGoals',
-  totalMatches: 'totalMatches',
-  totalStartedMatches: 'totalStartedMatches',
-  totalPlayedMatches: 'totalPlayedMatches',
-  matches: 'matches',
+  averageRating: 'Score moyen du joueur',
+  totalGoals: 'Total de buts',
+  totalMatches: 'Total de matchs',
+  totalStartedMatches: 'Matchs commencés',
+  totalPlayedMatches: 'Total des matchs joués ',
+  matches: 'Matches',
 }
