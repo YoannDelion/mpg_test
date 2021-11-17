@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text, Image } from 'react-native'
+import { View, Text } from 'react-native'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../navigation/Navigation'
 import formatPlayerName from '../utils/formatPlayerName'
@@ -11,6 +11,7 @@ import MatchCard from '../components/MatchCard'
 import Error from '../components/Error'
 import Title from '../components/Title'
 import Loader from '../components/Loader'
+import Subtitle from '../components/Subtitle'
 
 const StyledScrollView = styled.ScrollView`
   padding-horizontal: 10px;
@@ -20,10 +21,6 @@ const MainDataContainer = styled.View`
   flex-direction: row;
   align-items: center;
   justify-content: space-around;
-`
-const Subtitle = styled.Text`
-  font-weight: bold;
-  font-size: 16px;
 `
 const StatContainer = styled.View`
   background: white;

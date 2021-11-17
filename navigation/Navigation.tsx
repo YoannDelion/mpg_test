@@ -23,7 +23,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>()
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName='PlayerList'>
+      <Stack.Navigator initialRouteName='Home'>
         <Stack.Screen
           name='Home'
           component={HomeScreen}
@@ -31,7 +31,11 @@ export default function App() {
             headerShown: false,
           }}
         />
-        <Stack.Screen name='PlayerList' component={PlayerListScreen} />
+        <Stack.Screen
+          name='PlayerList'
+          component={PlayerListScreen}
+          options={{ title: 'Liste des joueurs' }}
+        />
         <Stack.Screen
           name='PlayerDetails'
           component={PlayerDetailsScreen}
