@@ -9,6 +9,7 @@ import { POSITIONS } from '../utils/consants'
 import { PlayersByClubsType } from '../types/PlayerByClubs'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../navigation/Navigation'
+import formatClubName from '../utils/formatClubName'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'PlayerList'>
 
@@ -90,14 +91,16 @@ export default function PlayerListScreen({ navigation }: Props) {
         ) : (
           Object.values(playersByClubs).map((playerByClub, index) => (
             <View key={index} style={styles.card}>
-              <Text style={styles.title}>{playerByClub.club.shortName}</Text>
+              <Text style={styles.title}>{formatClubName(playerByClub.club)}</Text>
               {playerByClub.players.map((player) => (
                 <Pressable
                   key={player.id}
                   onPress={() =>
                     navigation.navigate('PlayerDetails', {
                       player,
-                      club: playerByClub.club,
+                      currentClub: playerByClub.club,
+                      clubs,
+                      title: `${formatPlayerName(player)} - ${playerByClub.club.shortName}`,
                     })
                   }
                 >

@@ -16,7 +16,7 @@ interface MatchType {
   }
 }
 
-interface StatsType {
+export interface StatsType {
   averageRating: number
   totalGoals: number
   totalMatches: number

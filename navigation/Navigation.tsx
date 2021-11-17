@@ -12,7 +12,9 @@ export type RootStackParamList = {
   PlayerList: undefined
   PlayerDetails: {
     player: PlayerType
-    club: ClubType
+    currentClub: ClubType
+    clubs: { [key: string]: ClubType }
+    title?: string
   }
 }
 
@@ -21,7 +23,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>()
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName='Home'>
+      <Stack.Navigator initialRouteName='PlayerList'>
         <Stack.Screen
           name='Home'
           component={HomeScreen}
@@ -30,7 +32,11 @@ export default function App() {
           }}
         />
         <Stack.Screen name='PlayerList' component={PlayerListScreen} />
-        <Stack.Screen name='PlayerDetails' component={PlayerDetailsScreen} />
+        <Stack.Screen
+          name='PlayerDetails'
+          component={PlayerDetailsScreen}
+          options={({ route }) => ({ title: route.params.title || 'Détail du joueur' })}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   )
