@@ -3,18 +3,10 @@ import { StyleSheet, View, Text, ScrollView, TextInput, Pressable } from 'react-
 import { Picker } from '@react-native-community/picker'
 import useFetch from '../hooks/useFetch'
 import { FontAwesome5 } from '@expo/vector-icons'
-
-const POSITIONS = {
-  10: 'Gardien',
-  20: 'Defenseur',
-  21: 'Lateral',
-  30: 'Milieu défensir',
-  31: 'Milieu offensif',
-  40: 'Attaquant',
-}
-
-const formatPlayerName = (player) =>
-  player.firstName ? `${player.firstName} ${player.lastName}` : player.lastName
+import PlayerType from '../types/PlayerType'
+import formatPlayerName from '../utils/formatPlayerName'
+import { POSITIONS } from '../utils/consants'
+import { PlayersByClubsType } from '../types/PlayerByClubs'
 
 export default function PlayerListScreen() {
   const [input, setInput] = useState('')
@@ -27,18 +19,20 @@ export default function PlayerListScreen() {
     'https://api.mpg.football/api/data/championship-players-pool/1'
   )
   const clubs = clubsData?.championshipClubs
-  const players = playersData?.poolPlayers
-    .filter((player) => {
+
+  let players: PlayerType[] = playersData?.poolPlayers
+  players = players
+    ?.filter((player) => {
       if (selectedValue === '') return true
-      return player.ultraPosition == selectedValue
+      return player.ultraPosition === parseInt(selectedValue)
     })
     .filter((player) => formatPlayerName(player).toLowerCase().includes(input.toLowerCase().trim()))
     .sort((a, b) => a.ultraPosition - b.ultraPosition)
 
-  const playersByClubs =
+  const playersByClubs: PlayersByClubsType =
     clubs &&
     players?.reduce(
-      (acc, elem) =>
+      (acc: PlayersByClubsType, elem: PlayerType) =>
         acc.hasOwnProperty(elem.clubId)
           ? {
               ...acc,
@@ -51,8 +45,9 @@ export default function PlayerListScreen() {
       {}
     )
 
-  const positions = playersData?.poolPlayers.reduce(
-    (acc, elem) => (acc.includes(elem.ultraPosition) ? acc : acc.concat(elem.ultraPosition)),
+  const positions: number[] = playersData?.poolPlayers.reduce(
+    (acc: number[], elem: PlayerType) =>
+      acc.includes(elem.ultraPosition) ? acc : acc.concat(elem.ultraPosition),
     []
   )
 
@@ -73,12 +68,14 @@ export default function PlayerListScreen() {
       <Picker
         selectedValue={selectedValue}
         style={{ height: 50, width: 150 }}
-        onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}
+        onValueChange={(itemValue) => setSelectedValue(itemValue.toString())}
       >
         <Picker.Item label={'Sélectionner'} value={''} />
         {positions?.map(
           (position) =>
-            POSITIONS[position] && <Picker.Item label={POSITIONS[position]} value={position} />
+            POSITIONS[position] && (
+              <Picker.Item key={position} label={POSITIONS[position]} value={position} />
+            )
         )}
       </Picker>
       <ScrollView>
@@ -88,7 +85,7 @@ export default function PlayerListScreen() {
           <Text>Aucun résultat</Text>
         ) : (
           Object.values(playersByClubs).map((playerByClub, index) => (
-            <View key={index} style={{ border: '1px solid black', margin: 2, padding: 2 }}>
+            <View key={index} style={styles.card}>
               <Text style={styles.title}>{playerByClub.club.shortName}</Text>
               {playerByClub.players.map((player) => (
                 <Text key={player.id}>{formatPlayerName(player)}</Text>
@@ -121,4 +118,5 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 10,
   },
+  card: { border: '1px solid black', margin: 2, padding: 2 },
 })
